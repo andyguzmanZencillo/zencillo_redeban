@@ -1,4 +1,6 @@
 import 'package:oxidized/oxidized.dart';
+import 'package:zencillo_helpers/zencillo_helpers.dart';
+import 'package:zencillo_redeban/map/map.dart';
 
 import 'models/redeban_response.dart';
 import 'zencillo_redeban_platform_interface.dart';
@@ -8,7 +10,7 @@ class ZencilloRedeban {
     return ZencilloRedebanPlatform.instance.getPlatformVersion();
   }
 
-  Future<Result<RedebanResponse, String>> redeban({
+  Future<Result<RedebanResponse, String>> redebanPay({
     required String amount,
     required String tax,
   }) {
@@ -16,6 +18,34 @@ class ZencilloRedeban {
       amount: amount,
       tax: tax,
     );
+  }
+
+  Future<Result<FormaPagoDetalleModel, String>> redebanPayFull({
+    required int idTurno,
+    required int numeroTurno,
+    required int idDocument,
+    required double total,
+    required double taxTotal,
+    required double subTotal,
+    required int idFormaPago,
+  }) async {
+    final result = await ZencilloRedebanPlatform.instance.redeban(
+      amount: total.toString(),
+      tax: taxTotal.toString(),
+    );
+    if (result.isErr()) {
+      return Err(result.unwrapErr());
+    }
+    final data = result.unwrap();
+    return Ok(data.toFormaPagoDetalle(
+      idTurno: idTurno,
+      numeroTurno: numeroTurno,
+      idDocument: idDocument,
+      total: total,
+      taxTotal: taxTotal,
+      subTotal: subTotal,
+      idFormaPago: idFormaPago,
+    ));
   }
 
   Future<Result<RedebanResponse, String>> redebanAnulacion({
