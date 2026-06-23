@@ -66,6 +66,7 @@ extension RedebanFormaPagoDetalleMapper on RedebanResponse {
       idCashBack: 0,
       anulada: false,
       multiplesVentas: false,
+      result: true,
     );
 
     return result;
