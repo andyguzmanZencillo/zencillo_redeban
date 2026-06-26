@@ -48,6 +48,30 @@ class ZencilloRedeban {
     ));
   }
 
+  Future<Result<FormaPagoDetalleModel, String>> redebanPayComplete({
+    required double total,
+    required double subTotal,
+    required double taxTotal,
+  }) async {
+    final result = await ZencilloRedebanPlatform.instance.redeban(
+      amount: total.toString(),
+      tax: taxTotal.toString(),
+    );
+    if (result.isErr()) {
+      return Err(result.unwrapErr());
+    }
+    final data = result.unwrap();
+    return Ok(data.toFormaPagoDetalle(
+      idTurno: 0,
+      numeroTurno: 0,
+      idDocument: 0,
+      total: total,
+      taxTotal: taxTotal,
+      subTotal: subTotal,
+      idFormaPago: 0,
+    ));
+  }
+
   Future<Result<RedebanResponse, String>> redebanAnulacion({
     required String numeroRecibo,
     required String claveSupervisor,
