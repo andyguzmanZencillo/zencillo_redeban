@@ -17,7 +17,7 @@ extension RedebanFormaPagoDetalleMapper on RedebanResponse {
       identificacionRed: 'REDEBAN',
       codigoRespuestaActor: '',
       mensajeRespuesta: data,
-      secuencialTransaccion: int.parse(numeroRecibo),
+      secuencialTransaccion: int.tryParse(numeroRecibo.trim()) ?? 0,
       numeroLote: numeroTurno,
       horaTransaccion: DateTime.now().getHourWindDev(),
       fechaTransaccion: DateTime.now(),
