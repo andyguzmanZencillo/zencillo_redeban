@@ -81,14 +81,14 @@ class ZencilloRedebanPlugin :
             }
 
             "redeban" -> {
-                if (!isPackageInstalled(REDEBAN_PACKAGE)) {
+                /*if (!isPackageInstalled(REDEBAN_PACKAGE)) {
                     result.error(
                         "Solicitud cancelada!",
                         "La Aplicación no se encuentra instalada.",
                         null
                     )
                     return
-                }
+                }*/
 
                 pendingResult = result
 
@@ -102,14 +102,14 @@ class ZencilloRedebanPlugin :
             }
 
             "redebanAnulacion" -> {
-                if (!isPackageInstalled(REDEBAN_PACKAGE)) {
+                /*if (!isPackageInstalled(REDEBAN_PACKAGE)) {
                     result.error(
                         "Solicitud cancelada!",
                         "La Aplicación no se encuentra instalada.",
                         null
                     )
                     return
-                }
+                }*/
 
                 pendingResult = result
 
