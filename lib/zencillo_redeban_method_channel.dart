@@ -24,33 +24,48 @@ class MethodChannelZencilloRedeban extends ZencilloRedebanPlatform {
   Future<Result<RedebanResponse, String>> redeban({
     required String amount,
     required String tax,
+    int? inc,
+    int? montoBaseIva,
+    int? montoBaseInc,
+    int? baseDevolucion,
   }) async {
     try {
+      final arguments = <String, dynamic>{
+        'amount': amount,
+        'tax': tax,
+      };
+      if (inc != null) {
+        arguments['inc'] = inc;
+      }
+      if (montoBaseIva != null) {
+        arguments['montoBaseIva'] = montoBaseIva;
+      }
+      if (montoBaseInc != null) {
+        arguments['montoBaseInc'] = montoBaseInc;
+      }
+      if (baseDevolucion != null) {
+        arguments['baseDevolucion'] = baseDevolucion;
+      }
+
       final response = await methodChannel.invokeMethod<String>(
         'redeban',
-        {
-          'amount': amount,
-          'tax': tax,
-        },
+        arguments,
       );
 
-      if (response == null) {
+      if (response == null || response.trim().isEmpty) {
         return const Result.err('No se recibió respuesta del método redeban');
       }
 
       final jsonString = limpiarJson(response);
-      final jsonMap = jsonDecode(jsonString);
+      final decoded = jsonDecode(jsonString);
 
-      final operacion = RedebanResponse.fromJson(
-        jsonMap as Map<String, dynamic>,
-      );
-
-      if (operacion.codigoRespuesta == '86' ||
-          int.parse(operacion.codigoRespuesta) < 0) {
-        return Result.err(operacion.mensajeError);
+      if (decoded is! Map<String, dynamic>) {
+        return const Result.err('Respuesta con formato inválido.');
       }
 
-      return Result.ok(operacion);
+      final operacion = RedebanResponse.fromJson(decoded);
+
+      return _evaluarRespuestaRedeban(operacion);
     } on PlatformException catch (e) {
       return Result.err(e.message ?? 'Error de plataforma.');
     } catch (e, stacktrace) {
@@ -74,25 +89,22 @@ class MethodChannelZencilloRedeban extends ZencilloRedebanPlatform {
         },
       );
 
-      if (response == null) {
+      if (response == null || response.trim().isEmpty) {
         return const Result.err(
           'No se recibió respuesta del método redebanAnulacion',
         );
       }
 
       final jsonString = limpiarJson(response);
-      final jsonMap = jsonDecode(jsonString);
+      final decoded = jsonDecode(jsonString);
 
-      final operacion = RedebanResponse.fromJson(
-        jsonMap as Map<String, dynamic>,
-      );
-
-      if (operacion.codigoRespuesta == '86' ||
-          int.parse(operacion.codigoRespuesta) < 0) {
-        return Result.err(operacion.mensajeError);
+      if (decoded is! Map<String, dynamic>) {
+        return const Result.err('Respuesta con formato inválido.');
       }
 
-      return Result.ok(operacion);
+      final operacion = RedebanResponse.fromJson(decoded);
+
+      return _evaluarRespuestaRedeban(operacion);
     } on PlatformException catch (e) {
       return Result.err(e.message ?? 'Error de plataforma.');
     } catch (e, stacktrace) {
@@ -100,6 +112,28 @@ class MethodChannelZencilloRedeban extends ZencilloRedebanPlatform {
       log('REDEBAN ANULACION FAILED ===> $stacktrace');
       return const Result.err('Algo falló!');
     }
+  }
+
+  /// Solo `Codigo_respuesta` == `00` se considera transacción aprobada.
+  Result<RedebanResponse, String> _evaluarRespuestaRedeban(
+    RedebanResponse operacion,
+  ) {
+    final codigo = operacion.codigoRespuesta.trim();
+
+    if (codigo == '00') {
+      return Result.ok(operacion);
+    }
+
+    final mensaje = operacion.mensajeError.trim();
+    if (mensaje.isNotEmpty) {
+      return Result.err(mensaje);
+    }
+
+    if (codigo.isNotEmpty) {
+      return Result.err('Transacción rechazada (código $codigo).');
+    }
+
+    return const Result.err('Transacción rechazada.');
   }
 
   String limpiarJson(String entrada) {

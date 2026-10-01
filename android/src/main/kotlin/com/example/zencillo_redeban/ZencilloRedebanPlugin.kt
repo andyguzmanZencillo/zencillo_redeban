@@ -90,14 +90,29 @@ class ZencilloRedebanPlugin :
                     return
                 }*/
 
-                pendingResult = result
-
                 val amount = call.argument<String>("amount") ?: "0"
                 val tax = call.argument<String>("tax") ?: "0"
 
+                val amountInt = amount.toDoubleOrNull()?.toInt()
+                val taxInt = tax.toDoubleOrNull()?.toInt()
+
+                if (amountInt == null || taxInt == null) {
+                    result.error(
+                        "INVALID_AMOUNT",
+                        "Monto o impuesto inválido.",
+                        null
+                    )
+                    return
+                }
+
+                pendingResult = result
                 launchRedeban(
-                    amount.toDouble().toInt(),
-                    tax.toDouble().toInt()
+                    amountInt,
+                    taxInt,
+                    call.argument<Int>("inc"),
+                    call.argument<Int>("montoBaseIva"),
+                    call.argument<Int>("montoBaseInc"),
+                    call.argument<Int>("baseDevolucion"),
                 )
             }
 
@@ -161,11 +176,19 @@ class ZencilloRedebanPlugin :
         return true
     }
 
-    private fun launchRedeban(amount: Int, iva: Int) {
+    private fun launchRedeban(
+        amount: Int,
+        iva: Int,
+        inc: Int? = null,
+        montoBaseIva: Int? = null,
+        montoBaseInc: Int? = null,
+        baseDevolucion: Int? = null,
+    ) {
         val currentActivity = activity
 
         if (currentActivity == null) {
             pendingResult?.error("NO_ACTIVITY", "No hay Activity disponible.", null)
+            pendingResult = null
             return
         }
 
@@ -180,10 +203,10 @@ class ZencilloRedebanPlugin :
         val paramsJson = JSONObject()
         paramsJson.put("Monto", amount)
         paramsJson.put("Iva", adjustedIva)
-        paramsJson.put("Inc", 0)
-        paramsJson.put("Monto_base_iva", adjustedSubtotal)
-        paramsJson.put("Monto_base_inc", 0)
-        paramsJson.put("Base_devolucion", adjustedSubtotal)
+        paramsJson.put("Inc", inc ?: 0)
+        paramsJson.put("Monto_base_iva", montoBaseIva ?: adjustedSubtotal)
+        paramsJson.put("Monto_base_inc", montoBaseInc ?: 0)
+        paramsJson.put("Base_devolucion", baseDevolucion ?: (montoBaseIva ?: adjustedSubtotal))
 
         saleJson.put("properties", paramsJson)
 
@@ -212,6 +235,7 @@ class ZencilloRedebanPlugin :
 
         if (currentActivity == null) {
             pendingResult?.error("NO_ACTIVITY", "No hay Activity disponible.", null)
+            pendingResult = null
             return
         }
 

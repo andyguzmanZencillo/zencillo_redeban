@@ -25,6 +25,10 @@ abstract class ZencilloRedebanPlatform extends PlatformInterface {
   Future<Result<RedebanResponse, String>> redeban({
     required String amount,
     required String tax,
+    int? inc,
+    int? montoBaseIva,
+    int? montoBaseInc,
+    int? baseDevolucion,
   }) {
     throw UnimplementedError('redeban() has not been implemented.');
   }

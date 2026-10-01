@@ -13,10 +13,18 @@ class ZencilloRedeban {
   Future<Result<RedebanResponse, String>> redebanPay({
     required String amount,
     required String tax,
+    int? inc,
+    int? montoBaseIva,
+    int? montoBaseInc,
+    int? baseDevolucion,
   }) {
     return ZencilloRedebanPlatform.instance.redeban(
       amount: amount,
       tax: tax,
+      inc: inc,
+      montoBaseIva: montoBaseIva,
+      montoBaseInc: montoBaseInc,
+      baseDevolucion: baseDevolucion,
     );
   }
 
@@ -32,6 +40,8 @@ class ZencilloRedeban {
     final result = await ZencilloRedebanPlatform.instance.redeban(
       amount: total.toString(),
       tax: taxTotal.toString(),
+      montoBaseIva: taxTotal > 0 ? subTotal.round() : null,
+      baseDevolucion: taxTotal > 0 ? subTotal.round() : null,
     );
     if (result.isErr()) {
       return Err(result.unwrapErr());
@@ -56,6 +66,8 @@ class ZencilloRedeban {
     final result = await ZencilloRedebanPlatform.instance.redeban(
       amount: total.toString(),
       tax: taxTotal.toString(),
+      montoBaseIva: taxTotal > 0 ? subTotal.round() : null,
+      baseDevolucion: taxTotal > 0 ? subTotal.round() : null,
     );
     if (result.isErr()) {
       return Err(result.unwrapErr());
