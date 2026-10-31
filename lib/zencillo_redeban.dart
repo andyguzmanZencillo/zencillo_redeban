@@ -17,6 +17,7 @@ class ZencilloRedeban {
     int? montoBaseIva,
     int? montoBaseInc,
     int? baseDevolucion,
+    String? flagConfirmacionValores,
   }) {
     return ZencilloRedebanPlatform.instance.redeban(
       amount: amount,
@@ -25,6 +26,7 @@ class ZencilloRedeban {
       montoBaseIva: montoBaseIva,
       montoBaseInc: montoBaseInc,
       baseDevolucion: baseDevolucion,
+      flagConfirmacionValores: flagConfirmacionValores,
     );
   }
 

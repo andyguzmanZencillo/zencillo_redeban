@@ -28,11 +28,13 @@ class MethodChannelZencilloRedeban extends ZencilloRedebanPlatform {
     int? montoBaseIva,
     int? montoBaseInc,
     int? baseDevolucion,
+    String? flagConfirmacionValores,
   }) async {
     try {
       final arguments = <String, dynamic>{
         'amount': amount,
         'tax': tax,
+        'flagConfirmacionValores': flagConfirmacionValores ?? '1',
       };
       if (inc != null) {
         arguments['inc'] = inc;
