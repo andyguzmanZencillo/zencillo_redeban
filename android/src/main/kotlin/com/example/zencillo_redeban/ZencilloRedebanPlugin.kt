@@ -201,6 +201,7 @@ class ZencilloRedebanPlugin :
         saleJson.put("TipoTransaccion", "1")
 
         val paramsJson = JSONObject()
+        paramsJson.put("FlagConfirmacionValores", "1")
         paramsJson.put("Monto", amount)
         paramsJson.put("Iva", adjustedIva)
         paramsJson.put("Inc", inc ?: 0)
