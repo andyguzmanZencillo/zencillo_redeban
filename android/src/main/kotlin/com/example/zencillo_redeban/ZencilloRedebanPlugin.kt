@@ -113,6 +113,7 @@ class ZencilloRedebanPlugin :
                     call.argument<Int>("montoBaseIva"),
                     call.argument<Int>("montoBaseInc"),
                     call.argument<Int>("baseDevolucion"),
+                    call.argument<String>("flagConfirmacionValores"),
                 )
             }
 
@@ -183,6 +184,7 @@ class ZencilloRedebanPlugin :
         montoBaseIva: Int? = null,
         montoBaseInc: Int? = null,
         baseDevolucion: Int? = null,
+        flagConfirmacionValores: String? = null,
     ) {
         val currentActivity = activity
 
@@ -207,6 +209,8 @@ class ZencilloRedebanPlugin :
         paramsJson.put("Monto_base_iva", montoBaseIva ?: adjustedSubtotal)
         paramsJson.put("Monto_base_inc", montoBaseInc ?: 0)
         paramsJson.put("Base_devolucion", baseDevolucion ?: (montoBaseIva ?: adjustedSubtotal))
+        paramsJson.put("FlagConfirmacionValores", flagConfirmacionValores ?: "0")
+
 
         saleJson.put("properties", paramsJson)
 

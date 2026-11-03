@@ -29,6 +29,7 @@ abstract class ZencilloRedebanPlatform extends PlatformInterface {
     int? montoBaseIva,
     int? montoBaseInc,
     int? baseDevolucion,
+    String? flagConfirmacionValores,
   }) {
     throw UnimplementedError('redeban() has not been implemented.');
   }
